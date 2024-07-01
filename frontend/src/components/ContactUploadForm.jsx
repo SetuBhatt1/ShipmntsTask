@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Table, Button } from 'react-bootstrap';
 import * as XLSX from 'xlsx';
 
-const UploadForm = () => {
+const ContactUploadForm = () => {
   const [file, setFile] = useState(null);
   const [data, setData] = useState([]);
   const [uploadStatus, setUploadStatus] = useState('');
@@ -13,53 +13,48 @@ const UploadForm = () => {
     const file = e.target.files[0];
     console.log('Selected file:', file);
     setFile(file);
-  
+
     const reader = new FileReader();
     reader.onload = async (event) => {
       const binaryString = event.target.result;
       const workbook = XLSX.read(binaryString, { type: 'binary' });
-      const sheetName = workbook.SheetNames[0];
+      const sheetName = workbook.SheetNames[0]; //header
       const worksheet = workbook.Sheets[sheetName];
-  
+
+      // Convert the first worksheet to JSON
       const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-  
-      console.log("JSON data:", jsonData);
-  
-      const headers = jsonData.shift(); // Remove header
-      const transformedData = jsonData.map(row => {
-        const obj = {};
-        headers.forEach((header, index) => {
-          // set undefined to null
-          obj[header] = row[index]!== undefined? row[index] : null;
-        });
-        return obj;
-      });
-  
-      console.log("Transformed data:", transformedData);
-  
-      setData(transformedData); 
+      console.log("json data:", jsonData);
+
+      // Validate and filter rows
+      // const validatedData = validateRows(jsonData);
+      // console.log('Validated data:', validatedData); 
+      setData(jsonData);
     };
     reader.readAsBinaryString(file);
   };
-  
-  
-  
+
+  // Function to validate rows
+  // const validateRows = (rows) => {
+  //   const requiredFields = ['name', 'address', 'phone', 'email', 'website', 'noOfEmployees', 'foundedDate', 'industryType'];
+  //   console.log('All rows before validation:', rows); // Debugging line
+  //   return rows.filter(row => requiredFields.every(field => row.hasOwnProperty(field)));
+  // };
 
   // Function to handle upload to backend
   const handleUpload = async () => {
-    console.log('Uploading...');
+    console.log('Uploading...'); // Debugging line
     if (!file) {
       setUploadStatus('No file selected. Please select a file to upload.');
-      console.log('No file selected.');
+      console.log('No file selected.'); // Debugging line
       return;
     }
 
     try {
-       for (let i = 0; i < data.length; i++) {
+     for (let i = 0; i < data.length; i++) {
         const row = data[i];
         try {
           console.log("Sending row to backend:", row);
-          const response = await axios.post('http://localhost:4000/api/company', row, {
+          const response = await axios.post('http://localhost:4000/api/contact', row, {
             headers: {
               'Content-Type': 'application/json',
             },
@@ -80,12 +75,14 @@ const UploadForm = () => {
     }
   };
 
+
+
   return (
     <div>
       <input type="file" onChange={handleFileUpload} accept=".xls,.xlsx" />
 
       <Button variant="primary" onClick={handleUpload} disabled={!file}>
-        Upload
+        Contact Upload
       </Button>
 
       {uploadStatus && <p style={{ color: 'red' }}>{uploadStatus}</p>}
@@ -105,7 +102,7 @@ const UploadForm = () => {
           </thead>
           <tbody>
             {data.map((row, index) => (
-              <tr key={index} style={{ backgroundColor: index % 2 === 0? '#f9f9f9' : 'transparent' }}>
+              <tr key={index} style={{ backgroundColor: index % 2 === 0 ? '#f9f9f9' : 'transparent' }}>
                 {Object.values(row).map((value, index) => (
                   <td key={index} style={{ padding: '12px 15px', verticalAlign: 'top' }}>{value}</td>
                 ))}
@@ -118,4 +115,4 @@ const UploadForm = () => {
   );
 };
 
-export default UploadForm;
+export default ContactUploadForm;
