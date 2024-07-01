@@ -26,7 +26,6 @@ const addCompany = async (req, res) => {
 
   try {
     const newCompany = new Company({
-      contacts,
       name,
       address,
       phone,
