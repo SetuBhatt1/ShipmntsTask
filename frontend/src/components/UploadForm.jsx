@@ -13,18 +13,18 @@
 //     const file = e.target.files[0];
 //     console.log('Selected file:', file);
 //     setFile(file);
-  
+
 //     const reader = new FileReader();
 //     reader.onload = async (event) => {
 //       const binaryString = event.target.result;
 //       const workbook = XLSX.read(binaryString, { type: 'binary' });
 //       const sheetName = workbook.SheetNames[0];
 //       const worksheet = workbook.Sheets[sheetName];
-  
+
 //       const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-  
+
 //       console.log("JSON data:", jsonData);
-  
+
 //       const headers = jsonData.shift(); // Remove header
 //       const transformedData = jsonData.map(row => {
 //         const obj = {};
@@ -44,14 +44,14 @@
 //         });
 //         return obj;
 //       });
-  
+
 //       console.log("Transformed data:", transformedData);
-  
+
 //       setData(transformedData);
 //     };
 //     reader.readAsBinaryString(file);
 //   };
-  
+
 
 //   // Function to handle upload to backend
 //   const handleUpload = async () => {
@@ -61,7 +61,7 @@
 //       console.log('No file selected.');
 //       return;
 //     }
-  
+
 //     try {
 //       for (let i = 0; i < data.length; i++) {
 //         const row = data[i];
@@ -75,12 +75,12 @@
 //           }
 //           return value!== undefined && value!== null && typeof value === typeof EXPECTED_SCHEMA[key];
 //         });
-  
+
 //         if (!isValid) {
 //           console.error(`Skipping invalid row: ${JSON.stringify(row)}`);
 //           continue; // Skip this row if it's invalid
 //         }
-  
+
 //         try {
 //           console.log("Sending row to backend:", row);
 //           const response = await axios.post('http://localhost:4000/api/company', row, {
@@ -95,7 +95,7 @@
 //           return; // prevent further recursive calls
 //         }
 //       }
-  
+
 //       setUploadStatus('Upload successful!');
 //       console.log('Upload successful');
 //     } catch (error) {
@@ -103,7 +103,7 @@
 //       setUploadStatus('Upload failed. Please try again.');
 //     }
 //   };
-  
+
 
 //   return (
 //     <div>
@@ -208,12 +208,12 @@ const UploadForm = () => {
             const dateString = row[index];
             if (dateString) {
               const date = new Date(dateString);
-              obj[header] = isNaN(date.getTime())? null : date; // Check if the date is valid
+              obj[header] = isNaN(date.getTime()) ? null : date; // Check if the date is valid
             } else {
               obj[header] = null;
             }
           } else {
-            obj[header] = row[index]!== undefined? row[index] : null;
+            obj[header] = row[index] !== undefined ? row[index] : null;
           }
         });
         return obj;
@@ -274,9 +274,9 @@ const UploadForm = () => {
       const value = row[key];
       if (schema[key] === Date) {
         const dateValue = new Date(value);
-        return!isNaN(dateValue.getTime()); // Check if the date is valid
+        return !isNaN(dateValue.getTime()); // Check if the date is valid
       }
-      return value!== undefined && value!== null && typeof value === typeof schema[key];
+      return value !== undefined && value !== null && typeof value === typeof schema[key];
     });
   };
 
@@ -301,30 +301,29 @@ const UploadForm = () => {
             </tr>
           </thead>
           <tbody>
-  {data.map((row, rowIndex) => (
-    <tr key={rowIndex} style={{ backgroundColor: rowIndex % 2 === 0? '#f9f9f9' : 'transparent' }}>
-      {Object.entries(row).map(([key, value], colIndex) => {
-        // Check if the value is a Date object
-        if (value instanceof Date) {
-          // Convert Date object to a string
-          const dateString = value.toLocaleDateString();
-          return (
-            <td key={colIndex} style={{ padding: '12px 15px', verticalAlign: 'top' }}>
-              {dateString}
-            </td>
-          );
-        } else {
-          // Render the value as is for non-Date objects
-          return (
-            <td key={colIndex} style={{ padding: '12px 15px', verticalAlign: 'top' }}>
-              {value!== null && value!== undefined? value.toString() : ''}
-            </td>
-          );
-        }
-      })}
-    </tr>
-  ))}
-</tbody>
+            {data.map((row, rowIndex) => (
+              <tr key={rowIndex} style={{ backgroundColor: rowIndex % 2 === 0 ? '#f9f9f9' : 'transparent' }}>
+                {Object.entries(row).map(([key, value], colIndex) => {
+                  // Check if the value is a Date object
+                  if (value instanceof Date) {
+                    // Convert Date object to a string
+                    const dateString = value.toLocaleDateString();
+                    return (
+                      <td key={colIndex} style={{ padding: '12px 15px', verticalAlign: 'top' }}>
+                        {dateString}
+                      </td>
+                    );
+                  } else {
+                    return (
+                      <td key={colIndex} style={{ padding: '12px 15px', verticalAlign: 'top' }}>
+                        {value !== null && value !== undefined ? value.toString() : ''}
+                      </td>
+                    );
+                  }
+                })}
+              </tr>
+            ))}
+          </tbody>
 
         </Table>
       )}
